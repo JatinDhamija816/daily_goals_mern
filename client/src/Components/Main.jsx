@@ -1,27 +1,35 @@
 import React, { useEffect, useState } from 'react'
-import Tasks from './Tasks'
 import axios from 'axios'
-const Main = () => {
 
+const Main = () => {
     const [tasks, setTask] = useState([])
     const [title, setTitle] = useState('')
     const [desc, setDesc] = useState('')
-
+    console.log(tasks)
     const Submit = async (e) => {
         e.preventDefault()
-        await axios.post('/createTodo', { title, desc })
+        await axios.post('http://localhost:5000/createTodo', { title, desc })
             .then((response) => {
-                setTask(response.data)
+                setTask([...tasks, response.data])
+                window.location.reload()
             })
+            .catch(err => console.log(err))
         setTitle('')
         setDesc('')
     }
+    const deleteTask = async (id) => {
+        await axios.delete(`http://localhost:5000/delete/${id}`)
+            .then(res => {
+                window.location.reload()
+            })
+    }
     useEffect(() => {
-        axios.get('/getTodo')
+        axios.get('http://localhost:5000/getTodo')
             .then((response) => {
                 setTask(response.data)
             })
     }, []);
+
     return (
         <div className='main'>
             <h1>TODO App</h1>
@@ -35,18 +43,20 @@ const Main = () => {
                     placeholder='Enter Description'
                     value={desc}
                     onChange={(e) => setDesc(e.target.value)}></textarea>
-                <button type='submit' className='submit'>Submit</button>
+                <button className='submit'>Submit</button>
             </form>
             {
                 tasks.map((item, index) => (
-                    <Tasks
-                        key={index}
-                        title={item.title}
-                        desc={item.desc}
-                    />
+                    <div key={index} className='tasks'>
+                        <div className='task'>
+                            <h3>{item.title}</h3>
+                            <p>{item.desc}</p>
+                        </div>
+                        <button onClick={(e) => deleteTask(item._id)} className='delete'>-</button>
+                    </div>
                 ))
             }
-        </div>
+        </div >
     )
 }
 

@@ -17,7 +17,9 @@ app.use('/', Router)
 app.listen(port, () => {
     console.log(`Server start at ${port}`)
 })
-
+app.get('/', (req, res) => {
+    res.send('Start')
+})
 const username = process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
 
